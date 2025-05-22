@@ -39,7 +39,7 @@ public class ConnectionPool {
      * @param connectionTimeout Connection timeout in seconds
      * @throws SQLException if there is an error initializing the pool
      */
-    public ConnectionPool(String url, String username, String password, int maxPoolSize,
+    private ConnectionPool(String url, String username, String password, int maxPoolSize,
                           int connectionTimeout) throws SQLException {
         this.url = url;
         this.username = username;

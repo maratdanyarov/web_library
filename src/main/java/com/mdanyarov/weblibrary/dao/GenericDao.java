@@ -6,8 +6,8 @@ import java.util.List;
 
 /**
  * Generic DAO interface for CRUD operations.
- * @param <T>
- * @param <K>
+ * @param <T> The entity type
+ * @param <K> The primary key type
  */
 public interface GenericDao<T, K> {
 
@@ -31,7 +31,7 @@ public interface GenericDao<T, K> {
     List<T> findAll(Connection connection) throws SQLException;
 
     /**
-     * Saves an entity (creqtes or updates).
+     * Saves an entity (creates or updates).
      *
      * @param entity The entity to save
      * @param connection Database connection to use
