@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="#{books.title}">Books - Library Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-book-open"></i>
+      <span th:text="#{app.name}">Library System</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/}" th:text="#{nav.home}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" th:href="@{/books}" th:text="#{nav.books}">Books</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasAnyRole('READER', 'LIBRARIAN', 'ADMIN')">
+          <a class="nav-link" th:href="@{/reader/orders}" th:text="#{nav.my.orders}">My Orders</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user"></i>
+            <span sec:authentication="name">User</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" th:href="@{/profile}" th:text="#{nav.profile}">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="dropdown-item" th:text="#{common.logout}">Logout</button>
+              </form>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item" sec:authorize="!isAuthenticated()">
+          <a class="nav-link" th:href="@{/login}" th:text="#{common.login}">Login</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col">
+      <h1 th:text="#{books.header}">Book Catalog</h1>
+
+      <!-- Success/Error Messages -->
+      <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${successMessage}">Success message</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span th:text="${errorMessage}">Error message</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Actions -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <form th:action="@{/books}" method="get" class="d-flex">
+        <div class="input-group">
+          <input type="text"
+                 class="form-control"
+                 name="search"
+                 th:value="${searchQuery}"
+                 th:placeholder="#{books.search.placeholder}"
+                 placeholder="Search books by title, author, or ISBN">
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="fas fa-search"></i>
+            <span th:text="#{books.search.button}">Search</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-4 text-end">
+      <a th:href="@{/books}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-list"></i>
+        <span th:text="#{books.show.all}">Show All</span>
+      </a>
+      <a th:href="@{/books/available}" class="btn btn-outline-success me-2">
+        <i class="fas fa-check-circle"></i>
+        Available Only
+      </a>
+      <a th:href="@{/books/create}"
+         class="btn btn-primary"
+         sec:authorize="hasAnyRole('LIBRARIAN', 'ADMIN')">
+        <i class="fas fa-plus"></i>
+        Add Book
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Results Info -->
+  <div th:if="${searchQuery}" class="row mb-3">
+    <div class="col">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        Search results for: "<strong th:text="${searchQuery}">query</strong>"
+        (<span th:text="${totalBooks}">0</span> results found)
+      </div>
+    </div>
+  </div>
+
+  <!-- Books Grid -->
+  <div th:if="${hasBooks}">
+    <div class="row">
+      <div class="col-md-4 col-lg-3 mb-4" th:each="book : ${books}">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title" th:text="${book.title}">Book Title</h5>
+            <p class="card-text text-muted mb-2">
+              <i class="fas fa-user"></i>
+              <span th:text="${book.author}">Author</span>
+            </p>
+            <p class="card-text text-muted mb-2" th:if="${book.publisher}">
+              <i class="fas fa-building"></i>
+              <span th:text="${book.publisher}">Publisher</span>
+            </p>
+            <p class="card-text text-muted mb-2" th:if="${book.publicationYear > 0}">
+              <i class="fas fa-calendar"></i>
+              <span th:text="${book.publicationYear}">2023</span>
+            </p>
+            <p class="card-text flex-grow-1" th:if="${book.description}">
+              <span th:text="${#strings.abbreviate(book.description, 100)}">Description...</span>
+            </p>
+
+            <!-- Available Copies Info -->
+            <div class="mb-3">
+                                <span class="badge bg-success" th:if="${book.availableCopiesCount > 0}">
+                                    <span th:text="#{books.available.copies(${book.availableCopiesCount})}">Available: 2</span>
+                                </span>
+              <span class="badge bg-danger" th:if="${book.availableCopiesCount == 0}">
+                                    Not Available
+                                </span>
+            </div>
+
+            <div class="mt-auto">
+              <a th:href="@{/books/{id}(id=${book.id})}"
+                 class="btn btn-outline-primary btn-sm me-2">
+                <i class="fas fa-eye"></i>
+                <span th:text="#{books.details}">Details</span>
+              </a>
+
+              <a th:href="@{/books/{id}/request(id=${book.id})}"
+                 class="btn btn-success btn-sm"
+                 th:if="${book.availableCopiesCount > 0}"
+                 sec:authorize="hasAnyRole('READER', 'LIBRARIAN', 'ADMIN')">
+                <i class="fas fa-book"></i>
+                <span th:text="#{books.request}">Request</span>
+              </a>
+
+              <!-- Admin/Librarian Actions -->
+              <div class="btn-group mt-2 w-100" sec:authorize="hasAnyRole('LIBRARIAN', 'ADMIN')">
+                <a th:href="@{/books/{id}/edit(id=${book.id})}"
+                   class="btn btn-outline-warning btn-sm">
+                  <i class="fas fa-edit"></i>
+                  Edit
+                </a>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        sec:authorize="hasRole('ADMIN')"
+                        data-bs-toggle="modal"
+                        th:data-bs-target="'#deleteModal' + ${book.id}">
+                  <i class="fas fa-trash"></i>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" th:id="'deleteModal' + ${book.id}" tabindex="-1" sec:authorize="hasRole('ADMIN')">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete "<span th:text="${book.title}">Book Title</span>"?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" class="d-inline">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Books Message -->
+  <div th:if="${!hasBooks}" class="row">
+    <div class="col text-center">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle fa-3x mb-3"></i>
+        <h4 th:text="#{books.no.results}">No books found</h4>
+        <p th:if="${searchQuery}">Try adjusting your search criteria.</p>
+        <p th:if="${!searchQuery}">The library catalog is currently empty.</p>
+      </div>
+
+      <a th:href="@{/books/create}"
+         class="btn btn-primary"
+         sec:authorize="hasAnyRole('LIBRARIAN', 'ADMIN')">
+        <i class="fas fa-plus"></i>
+        Add First Book
+      </a>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <nav th:if="${totalPages > 1}" aria-label="Book pagination">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled' : ''">
+        <a class="page-link"
+           th:href="@{/books(search=${searchQuery}, page=0, size=${pageSize})}"
+           th:text="#{pagination.first}">First</a>
+      </li>
+      <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled' : ''">
+        <a class="page-link"
+           th:href="@{/books(search=${searchQuery}, page=${previousPage}, size=${pageSize})}"
+           th:text="#{pagination.previous}">Previous</a>
+      </li>
+
+      <!-- Page Numbers -->
+      <li class="page-item"
+          th:each="pageNum : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+          th:classappend="${pageNum == currentPage} ? 'active' : ''">
+        <a class="page-link"
+           th:href="@{/books(search=${searchQuery}, page=${pageNum}, size=${pageSize})}"
+           th:text="${pageNum + 1}">1</a>
+      </li>
+
+      <li class="page-item" th:classappend="${!hasNext} ? 'disabled' : ''">
+        <a class="page-link"
+           th:href="@{/books(search=${searchQuery}, page=${nextPage}, size=${pageSize})}"
+           th:text="#{pagination.next}">Next</a>
+      </li>
+      <li class="page-item" th:classappend="${!hasNext} ? 'disabled' : ''">
+        <a class="page-link"
+           th:href="@{/books(search=${searchQuery}, page=${totalPages - 1}, size=${pageSize})}"
+           th:text="#{pagination.last}">Last</a>
+      </li>
+    </ul>
+
+    <!-- Pagination Info -->
+    <div class="text-center text-muted">
+      <small th:text="#{pagination.showing(${currentPage * pageSize + 1}, ${T(java.lang.Math).min((currentPage + 1) * pageSize, totalBooks)}, ${totalBooks})}">
+        Showing 1 to 12 of 24 entries
+      </small>
+    </div>
+  </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
