@@ -8,6 +8,7 @@ import com.mdanyarov.weblibrary.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, ConnectionPool connectionPool, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDao userDao, ConnectionPool connectionPool, @Lazy PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.connectionPool = connectionPool;
         this.passwordEncoder = passwordEncoder;

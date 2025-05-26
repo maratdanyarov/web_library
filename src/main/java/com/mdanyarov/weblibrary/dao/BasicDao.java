@@ -9,7 +9,8 @@ import java.util.List;
  * @param <T> The entity type
  * @param <K> The primary key type
  */
-public interface GenericDao<T, K> {
+// TODO: change the name (basic/abstract)
+public interface BasicDao<T, K> {
 
     /**
      * Finds an entity by ID.

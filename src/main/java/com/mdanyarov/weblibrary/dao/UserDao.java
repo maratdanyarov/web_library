@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public interface UserDao extends GenericDao<User, Long> {
+public interface UserDao extends BasicDao<User, Long> {
 
     /**
      * Finds a user by username

@@ -1,5 +1,6 @@
 -- Initial data for Library Management System
-USE library;
+-- UPDATED to use web_library database
+USE web_library;
 
 -- Insert initial genres
 INSERT INTO genres (name) VALUES
@@ -114,6 +115,3 @@ INSERT INTO orders (user_id, book_copy_id, order_type, order_status, order_date,
 (3, 1, 'HOME', 'RETURNED', '2025-05-01 10:00:00', '2025-05-01 14:00:00', '2025-05-15 23:59:59', 2),
 (4, 2, 'READING_ROOM', 'RETURNED', '2025-05-05 09:00:00', '2025-05-05 10:30:00', '2025-05-05 17:00:00', 2),
 (5, 4, 'HOME', 'RETURNED', '2025-05-08 13:20:00', '2025-05-08 15:00:00', '2025-05-22 23:59:59', 2);
-
--- Update the status of reserved book copy
-UPDATE book_copies SET status = 'RESERVED' WHERE id = 6;

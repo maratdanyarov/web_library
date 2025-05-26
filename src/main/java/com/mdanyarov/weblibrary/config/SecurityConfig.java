@@ -4,6 +4,8 @@ import com.mdanyarov.weblibrary.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,13 +24,6 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
-
-    @Autowired
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     /**
      * Bean for password encoding using BCrypt.
      *
@@ -39,18 +34,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * CSRF token repository for protecting against CSRF attacks.
-     * Uses HTTP session to store CSRF tokens.
-     *
-     * @return CsrfTokenRepository instance
-     */
-    @Bean
-    public CsrfTokenRepository csrfTokenRepository() {
-        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
-        repository.setHeaderName("X-CSRF-TOKEN");
-        return repository;
-    }
+//    /**
+//     * CSRF token repository for protecting against CSRF attacks.
+//     * Uses HTTP session to store CSRF tokens.
+//     *
+//     * @return CsrfTokenRepository instance
+//     */
+//    @Bean
+//    public CsrfTokenRepository csrfTokenRepository() {
+//        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+//        repository.setHeaderName("X-CSRF-TOKEN");
+//        return repository;
+//    }
 
     /**
      * Configures the security filter chain.
@@ -79,7 +74,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(csrfTokenRepository())
+                        .ignoringRequestMatchers("/api/**")
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(1)
@@ -91,10 +86,13 @@ public class SecurityConfig {
 
     /**
      * Configures authentication manager.
+     *
      */
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth,
+                                @Lazy CustomUserDetailsService userDetailsService,
+                                PasswordEncoder passwordEncoder) throws Exception {
         auth.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(passwordEncoder);
     }
 }

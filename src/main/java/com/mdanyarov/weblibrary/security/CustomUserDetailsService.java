@@ -3,6 +3,7 @@ package com.mdanyarov.weblibrary.security;
 import com.mdanyarov.weblibrary.entity.User;
 import com.mdanyarov.weblibrary.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,15 +24,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserService userService;
 
     @Autowired
-    public CustomUserDetailsService(UserService userService) {
+    public CustomUserDetailsService(@Lazy UserService userService) {
         this.userService = userService;
     }
 
     /**
+     * Loads the user details by username for authentication and authorization purposes.
      *
-     * @param username
-     * @return
-     * @throws UsernameNotFoundException
+     * @param username the username identifying the user whose data is required
+     * @return a fully populated object containing user credentials and roles
+     * @throws UsernameNotFoundException if the user cannot be found or is blocked, or if an error occurs while loading user details
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -58,12 +59,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     /**
      * Custom UserDetails implementation
      */
-    public static class CustomUserPrincipal implements UserDetails {
-        private final User user;
-
-        public CustomUserPrincipal(User user) {
-            this.user = user;
-        }
+    public record CustomUserPrincipal(User user) implements UserDetails {
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -74,12 +70,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         @Override
         public String getPassword() {
-            return "";
+            return user.getPassword();
         }
 
         @Override
         public String getUsername() {
-            return user.getPassword();
+            return user.getUsername();
         }
 
         @Override
@@ -100,10 +96,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         @Override
         public boolean isEnabled() {
             return user.getStatus() == User.UserStatus.ACTIVE;
-        }
-
-        public User getUser() {
-            return user;
         }
     }
 }

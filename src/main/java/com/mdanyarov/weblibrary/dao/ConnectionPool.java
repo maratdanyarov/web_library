@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ConnectionPool {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
-    private static ConnectionPool instance;
+    private static volatile ConnectionPool instance;
 
     private final String url;
     private final String username;
@@ -40,7 +40,7 @@ public class ConnectionPool {
      * @throws SQLException if there is an error initializing the pool
      */
     private ConnectionPool(String url, String username, String password, int maxPoolSize,
-                          int connectionTimeout) throws SQLException {
+                           int connectionTimeout) throws SQLException {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -61,11 +61,15 @@ public class ConnectionPool {
      * @return The connection pool instance
      * @throws SQLException if there is an error initializing the pool
      */
-    public static synchronized ConnectionPool getInstance(String url, String username,
-                                                          String password, int maxPoolSize) throws SQLException {
+    public static ConnectionPool getInstance(String url, String username,
+                                             String password, int maxPoolSize) throws SQLException {
         if (instance == null) {
-            instance = new ConnectionPool(url, username, password, maxPoolSize, 30);
-            logger.info("Connection pool initialized with max size: {}", maxPoolSize);
+            synchronized (ConnectionPool.class) {
+                if (instance == null) {
+                    instance = new ConnectionPool(url, username, password, maxPoolSize, 30);
+                    logger.info("Connection pool initialized with max size: {}", maxPoolSize);
+                }
+            }
         }
         return instance;
     }

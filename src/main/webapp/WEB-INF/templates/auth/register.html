@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="#{register.title}">Register - Library Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Top Navigation with Language Selector -->
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <i class="fas fa-book-open"></i>
+      <span th:text="#{app.name}">Library System</span>
+    </a>
+
+    <!-- Language Selector -->
+    <div class="dropdown">
+      <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-globe me-1"></i>
+        <span th:text="#{footer.language}">Language</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" th:href="@{/register(lang=en)}">
+          <i class="fas fa-flag-usa me-2"></i>English
+        </a></li>
+        <li><a class="dropdown-item" th:href="@{/register(lang=ru)}">
+          <i class="fas fa-flag me-2"></i>Русский
+        </a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-white text-center">
+          <h4><i class="fas fa-user-plus"></i> <span th:text="#{register.header}">Create New Account</span></h4>
+        </div>
+        <div class="card-body">
+
+          <!-- Success Message -->
+          <div th:if="${message}" class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${message}">Success message</span>
+          </div>
+
+          <!-- Registration Form -->
+          <form th:action="@{/register}" method="post" th:object="${user}">
+
+            <!-- Display All Validation Errors INSIDE the form -->
+            <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+              <h6><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h6>
+              <ul class="mb-0">
+                <li th:each="error : ${#fields.allErrors()}" th:text="${error}">Error message</li>
+              </ul>
+            </div>
+
+            <!-- First Name -->
+            <div class="mb-3">
+              <label for="firstName" class="form-label" th:text="#{register.firstname}">First Name</label>
+              <input type="text"
+                     class="form-control"
+                     id="firstName"
+                     th:field="*{firstName}"
+                     th:placeholder="#{register.firstname.placeholder}"
+                     required>
+              <div th:if="${#fields.hasErrors('firstName')}" class="text-danger">
+                <small th:errors="*{firstName}">First name error</small>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-3">
+              <label for="lastName" class="form-label" th:text="#{register.lastname}">Last Name</label>
+              <input type="text"
+                     class="form-control"
+                     id="lastName"
+                     th:field="*{lastName}"
+                     th:placeholder="#{register.lastname.placeholder}"
+                     required>
+              <div th:if="${#fields.hasErrors('lastName')}" class="text-danger">
+                <small th:errors="*{lastName}">Last name error</small>
+              </div>
+            </div>
+
+            <!-- Username -->
+            <div class="mb-3">
+              <label for="username" class="form-label" th:text="#{register.username}">Username</label>
+              <input type="text"
+                     class="form-control"
+                     id="username"
+                     th:field="*{username}"
+                     th:placeholder="#{register.username.placeholder}"
+                     required>
+              <div th:if="${#fields.hasErrors('username')}" class="text-danger">
+                <small th:errors="*{username}">Username error</small>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label" th:text="#{register.email}">Email</label>
+              <input type="email"
+                     class="form-control"
+                     id="email"
+                     th:field="*{email}"
+                     th:placeholder="#{register.email.placeholder}"
+                     required>
+              <div th:if="${#fields.hasErrors('email')}" class="text-danger">
+                <small th:errors="*{email}">Email error</small>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label" th:text="#{register.password}">Password</label>
+              <input type="password"
+                     class="form-control"
+                     id="password"
+                     th:field="*{password}"
+                     th:placeholder="#{register.password.placeholder}"
+                     required>
+              <div th:if="${#fields.hasErrors('password')}" class="text-danger">
+                <small th:errors="*{password}">Password error</small>
+              </div>
+              <small class="form-text text-muted" th:text="#{register.password.requirements}">Password must be at least 6 characters long</small>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label" th:text="#{register.confirm.password}">Confirm Password</label>
+              <input type="password"
+                     class="form-control"
+                     id="confirmPassword"
+                     th:field="*{confirmPassword}"
+                     th:placeholder="#{register.confirm.password.placeholder}"
+                     required>
+              <div th:if="${#fields.hasErrors('confirmPassword')}" class="text-danger">
+                <small th:errors="*{confirmPassword}">Confirm password error</small>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid mb-3">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-user-plus me-2"></i>
+                <span th:text="#{register.submit}">Register</span>
+              </button>
+            </div>
+          </form>
+
+          <hr>
+
+          <!-- Back to Login Link -->
+          <div class="text-center">
+            <p class="mb-0">
+              Already have an account?
+              <a th:href="@{/login}" th:text="#{register.back.login}">Back to Login</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back to Home Link -->
+      <div class="text-center mt-3">
+        <a th:href="@{/}" class="text-decoration-none">
+          <i class="fas fa-home me-1"></i>
+          <span th:text="#{common.back.home}">Back to Home</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

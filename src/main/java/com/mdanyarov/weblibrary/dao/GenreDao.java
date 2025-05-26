@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * DAO interface for Genre entity
  */
-public interface GenreDao extends GenericDao<Genre, Long> {
+public interface GenreDao extends BasicDao<Genre, Long> {
 
     /**
      * Finds a genre by name

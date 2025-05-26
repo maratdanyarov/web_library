@@ -1,9 +1,13 @@
 package com.mdanyarov.weblibrary.controller;
 
 
+import com.mdanyarov.weblibrary.dto.UserRegistrationForm;
 import com.mdanyarov.weblibrary.entity.User;
 import com.mdanyarov.weblibrary.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +68,12 @@ public class AuthController {
      */
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new UserRegistrationForm());
+        logger.debug("Showing registration form");
+
+        if (!model.containsAttribute("user")) {
+            model.addAttribute("user", new UserRegistrationForm());
+            logger.debug("Added new UserRegistrationForm to model");
+        }
         return "auth/register";
     }
 
@@ -74,7 +83,13 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("user") UserRegistrationForm form,
                                BindingResult bindingResult,
+                               Model model,
                                RedirectAttributes redirectAttributes) {
+
+        logger.debug("Processing regisration for a user: {}", form != null ? form.getUsername() : "null");
+
+        model.addAttribute("user", form);
+
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
@@ -137,63 +152,4 @@ public class AuthController {
         return "dashboard";
     }
 
-    /**
-     * User registration form DTO.
-     */
-    public static class UserRegistrationForm {
-        private String username;
-        private String password;
-        private String confirmPassword;
-        private String email;
-        private String firstName;
-        private String lastName;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public String getConfirmPassword() {
-            return confirmPassword;
-        }
-
-        public void setConfirmPassword(String confirmPassword) {
-            this.confirmPassword = confirmPassword;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-    }
 }

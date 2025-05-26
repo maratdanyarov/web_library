@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * DAO interface for Order entity
  */
-public interface OrderDao extends GenericDao<Order, Long> {
+public interface OrderDao extends BasicDao<Order, Long> {
 
     /**
      * Finds orders by user ID.

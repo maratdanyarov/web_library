@@ -5,6 +5,9 @@ import com.mdanyarov.weblibrary.service.BookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +40,8 @@ public class BookController {
     public String showBookCatalog(@RequestParam(value = "search", required = false) String search,
                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "size", defaultValue = "12") int size,
-                                  Model model) {
+                                  Model model,
+                                  Authentication authentication) {
 
         try {
             List<Book> books;
@@ -81,11 +85,15 @@ public class BookController {
             model.addAttribute("previousPage", page - 1);
             model.addAttribute("nextPage", page + 1);
 
+            // Add authentication flags for template
+            addAuthenticationAttributes(model, authentication);
+
             return "books/catalog";
 
         } catch (Exception e) {
             logger.error("Error loading book catalog", e);
             model.addAttribute("errorMessage", "Error loading books. Please try again.");
+            addAuthenticationAttributes(model, authentication);
             return "books/catalog";
         }
     }
@@ -94,7 +102,7 @@ public class BookController {
      * Shows book details page.
      */
     @GetMapping("/{id}")
-    public String showBookDetails(@PathVariable Long id, Model model) {
+    public String showBookDetails(@PathVariable Long id, Model model, Authentication authentication) {
         try {
             Optional<Book> bookOptional = bookService.findById(id);
 
@@ -105,6 +113,9 @@ public class BookController {
 
             Book book = bookOptional.get();
             model.addAttribute("book", book);
+
+            // Add authentication flags for template
+            addAuthenticationAttributes(model, authentication);
 
             // TODO: Load book copies and availability info
             // TODO: Load genres for this book
@@ -134,7 +145,7 @@ public class BookController {
      * Shows available books only.
      */
     @GetMapping("/available")
-    public String showAvailableBooks(Model model) {
+    public String showAvailableBooks(Model model, Authentication authentication) {
         try {
             List<Book> books = bookService.findAvailable();
 
@@ -142,11 +153,15 @@ public class BookController {
             model.addAttribute("hasBooks", !books.isEmpty());
             model.addAttribute("showAvailableOnly", true);
 
+            // Add authentication flags for template
+            addAuthenticationAttributes(model, authentication);
+
             return "books/catalog";
 
         } catch (Exception e) {
             logger.error("Error loading available books", e);
             model.addAttribute("errorMessage", "Error loading available books. Please try again.");
+            addAuthenticationAttributes(model, authentication);
             return "books/catalog";
         }
     }
@@ -155,6 +170,7 @@ public class BookController {
      * Shows the book creation form (admin/librarian only).
      */
     @GetMapping("/create")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public String showCreateBookForm(Model model) {
         model.addAttribute("book", new Book());
         model.addAttribute("isEdit", false);
@@ -165,6 +181,7 @@ public class BookController {
      * Handles book creation (admin/librarian only).
      */
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public String createBook(@ModelAttribute Book book,
                              RedirectAttributes redirectAttributes) {
         try {
@@ -190,6 +207,7 @@ public class BookController {
      * Shows the book edit form (admin/librarian only).
      */
     @GetMapping("/{id}/edit")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public String showEditBookForm(@PathVariable Long id, Model model) {
         try {
             Optional<Book> bookOptional = bookService.findById(id);
@@ -214,6 +232,7 @@ public class BookController {
      * Handles book update (admin/librarian only).
      */
     @PostMapping("/{id}/edit")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public String updateBook(@PathVariable Long id,
                              @ModelAttribute Book book,
                              RedirectAttributes redirectAttributes) {
@@ -245,6 +264,7 @@ public class BookController {
      * Handles book deletion (admin only).
      */
     @PostMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deleteBook(@PathVariable Long id,
                              RedirectAttributes redirectAttributes) {
         try {
@@ -276,5 +296,45 @@ public class BookController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error deleting book. Please try again.");
             return "redirect:/books";
         }
+    }
+
+    /**
+     * Helper method to add authentication attributes to the model.
+     * This allows the template to show/hide elements based on user roles.
+     */
+    private void addAuthenticationAttributes(Model model, Authentication authentication) {
+        boolean isAuthenticated = authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName());
+
+        boolean isAdmin = false;
+        boolean isLibrarian = false;
+        boolean isReader = false;
+        String username = null;
+
+        if (isAuthenticated) {
+            username = authentication.getName();
+
+            for (GrantedAuthority authority : authentication.getAuthorities()) {
+                String role = authority.getAuthority();
+                switch (role) {
+                    case "ROLE_ADMIN":
+                        isAdmin = true;
+                        break;
+                    case "ROLE_LIBRARIAN":
+                        isLibrarian = true;
+                        break;
+                    case "ROLE_READER":
+                        isReader = true;
+                        break;
+                }
+            }
+        }
+
+        model.addAttribute("isAuthenticated", isAuthenticated);
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isLibrarian", isLibrarian);
+        model.addAttribute("isReader", isReader);
+        model.addAttribute("isLibrarianOrAdmin", isLibrarian || isAdmin);
+        model.addAttribute("currentUsername", username);
     }
 }

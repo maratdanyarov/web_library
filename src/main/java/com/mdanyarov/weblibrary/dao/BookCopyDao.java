@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * DAO interface for BookCopy entity
  */
-public interface BookCopyDao extends GenericDao<BookCopy, Long> {
+public interface BookCopyDao extends BasicDao<BookCopy, Long> {
 
     /**
      * Finds book copies by book ID.
@@ -25,7 +25,7 @@ public interface BookCopyDao extends GenericDao<BookCopy, Long> {
     /**
      * Finds book copies by inventory number.
      *
-     * @param inventoryNumber The inventoru number to search for
+     * @param inventoryNumber The inventory number to search for
      * @param connection Database connection to use
      * @return An Optional containing the book copy if found, or empty if not found
      * @throws SQLException if there is an error executing the query

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * DAO interface for Book entity
  */
-public interface BookDao extends GenericDao<Book, Long> {
+public interface BookDao extends BasicDao<Book, Long> {
 
     /**
      * Finds books by title (partial match).

@@ -8,12 +8,39 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
+<!-- Top Navigation with Language Selector -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-book-open"></i>
+            <span th:text="#{app.name}">Library System</span>
+        </a>
+
+        <!-- Language Selector -->
+        <div class="dropdown">
+            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-globe me-1"></i>
+                <span th:text="#{footer.language}">Language</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" th:href="@{/login(lang=en)}">
+                    <i class="fas fa-flag-usa me-2"></i>English
+                </a></li>
+                <li><a class="dropdown-item" th:href="@{/login(lang=ru)}">
+                    <i class="fas fa-flag me-2"></i>Русский
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-6 col-lg-4">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4><i class="fas fa-book-open"></i> Library System</h4>
+                <div class="card-header bg-dark text-white text-center">
+                    <h4><i class="fas fa-book-open"></i> <span th:text="#{app.name}">Library System</span></h4>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title text-center mb-4" th:text="#{login.header}">Login</h5>
@@ -58,14 +85,11 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-sign-in-alt"></i>
+                            <button type="submit" class="btn btn-dark">
+                                <i class="fas fa-sign-in-alt me-1"></i>
                                 <span th:text="#{login.submit}">Login</span>
                             </button>
                         </div>
-
-                        <!-- CSRF Token -->
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     </form>
 
                     <hr>
@@ -79,12 +103,12 @@
                 </div>
             </div>
 
-            <!-- Language Selector -->
+            <!-- Back to Home Link -->
             <div class="text-center mt-3">
-                <div class="btn-group" role="group">
-                    <a th:href="@{/login(lang=en)}" class="btn btn-outline-secondary btn-sm">English</a>
-                    <a th:href="@{/login(lang=ru)}" class="btn btn-outline-secondary btn-sm">Русский</a>
-                </div>
+                <a th:href="@{/}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    <span th:text="#{common.back.home}">Back to Home</span>
+                </a>
             </div>
         </div>
     </div>
