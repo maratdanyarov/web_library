@@ -5,6 +5,7 @@ import com.mdanyarov.weblibrary.entity.Genre;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.parameters.P;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.Optional;
 /**
  * JDBC implementation of GenreDao
  */
+@Repository
 public class GenreDaoImpl implements GenreDao {
     private static final Logger logger = LoggerFactory.getLogger(GenreDaoImpl.class);
 

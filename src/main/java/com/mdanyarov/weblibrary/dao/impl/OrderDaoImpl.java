@@ -7,6 +7,7 @@ import com.mdanyarov.weblibrary.entity.Order;
 import com.mdanyarov.weblibrary.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * JDBC implementation of OrderDao.
  */
+@Repository
 public class OrderDaoImpl implements OrderDao {
     private static final Logger logger = LoggerFactory.getLogger(OrderDaoImpl.class);
 

@@ -5,6 +5,7 @@ import com.mdanyarov.weblibrary.entity.Book;
 import com.mdanyarov.weblibrary.entity.BookCopy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.Optional;
 /**
  * JDBC Implementation of BookCopyDao
  */
+@Repository
 public class BookCopyDaoImpl implements BookCopyDao {
     private static final Logger logger = LoggerFactory.getLogger(BookCopyDaoImpl.class);
 

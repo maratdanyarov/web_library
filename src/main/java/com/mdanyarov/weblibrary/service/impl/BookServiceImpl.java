@@ -32,6 +32,13 @@ public class BookServiceImpl implements BookService {
         this.connectionPool = connectionPool;
     }
 
+    /**
+     * Finds a book by ID.
+     *
+     * @param id Book ID
+     * @return Optional containing the book if found, empty otherwise
+     * @throws Exception if there is an error finding the book
+     */
     @Override
     public Optional<Book> findById(Long id) throws Exception {
         logger.debug("Finding book by ID: {}", id);
@@ -42,6 +49,12 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Finds all books.
+     *
+     * @return List of all books
+     * @throws Exception if there is an error finding books
+     */
     @Override
     public List<Book> findAll() throws Exception {
         logger.debug("Finding all books");
@@ -51,6 +64,13 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Searches books by title.
+     *
+     * @param title Title to search for (partial match)
+     * @return List of matching books
+     * @throws Exception if there is an error searching books
+     */
     @Override
     public List<Book> searchByTitle(String title) throws Exception {
         logger.debug("Searching books by title: {}", title);
@@ -64,6 +84,13 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Searches books by author.
+     *
+     * @param author Author to search for (partial match)
+     * @return List of matching books
+     * @throws Exception if there is an error searching books
+     */
     @Override
     public List<Book> searchByAuthor(String author) throws Exception {
         logger.debug("Searching books by author: {}", author);
@@ -77,6 +104,13 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Searches books by ISBN.
+     *
+     * @param isbn ISBN to search for
+     * @return List of matching books
+     * @throws Exception if there is an error searching books
+     */
     @Override
     public List<Book> searchByIsbn(String isbn) throws Exception {
         logger.debug("Searching books by ISBN: {}", isbn);
@@ -90,6 +124,13 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Finds books by genre.
+     *
+     * @param genreId Genre ID
+     * @return List of books in the specified genre
+     * @throws Exception if there is an error finding books
+     */
     @Override
     public List<Book> findByGenre(Long genreId) throws Exception {
         logger.debug("Finding books by genre ID: {}", genreId);
@@ -99,6 +140,12 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Finds books that have at least one available copy.
+     *
+     * @return List of available books
+     * @throws Exception if there is an error finding books
+     */
     @Override
     public List<Book> findAvailable() throws Exception {
         logger.debug("Finding available books");
@@ -108,6 +155,14 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Finds books with pagination.
+     *
+     * @param page Page number (0-based)
+     * @param size Page size
+     * @return List of books for the specified page
+     * @throws Exception if there is an error finding books
+     */
     @Override
     public List<Book> findWithPagination(int page, int size) throws Exception {
         logger.debug("Finding books with pagination: page={}, size={}", page, size);
@@ -122,6 +177,12 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Gets the total count of books.
+     *
+     * @return Total number of books
+     * @throws Exception if there is an error counting books
+     */
     @Override
     public int getTotalCount() throws Exception {
         logger.debug("Getting total book count");
@@ -131,6 +192,13 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Searches books using multiple criteria.
+     *
+     * @param query Search query (title, author, or ISBN)
+     * @return List of matching books
+     * @throws Exception if there is an error searching books
+     */
     @Override
     public List<Book> search(String query) throws Exception {
         logger.debug("Searching books with query: {}", query);
@@ -156,6 +224,13 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    /**
+     * Creates a new book.
+     *
+     * @param book Book to create
+     * @return The created book with ID
+     * @throws Exception if there is an error creating the book
+     */
     @Override
     public Book createBook(Book book) throws Exception {
         logger.info("Creating new book: {}", book.getTitle());
@@ -183,6 +258,13 @@ public class BookServiceImpl implements BookService {
         });
     }
 
+    /**
+     * Updates an existing book.
+     *
+     * @param book Book with updated information
+     * @return true if the update was successful, false otherwise
+     * @throws Exception if there is an error updating the book
+     */
     @Override
     public boolean updateBook(Book book) throws Exception {
         logger.info("Updating book: {}", book.getId());
@@ -213,6 +295,13 @@ public class BookServiceImpl implements BookService {
         });
     }
 
+    /**
+     * Deletes a book by ID.
+     *
+     * @param id Book ID
+     * @return true if the deletion was successful, false otherwise
+     * @throws Exception if there is an error deleting the book
+     */
     @Override
     public boolean deleteBook(Long id) throws Exception {
         logger.info("Deleting book: {}", id);
